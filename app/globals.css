@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand: #f97316;
+    --brand-dark: #ea580c;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900 antialiased;
+  }
+
+  * {
+    @apply border-neutral-200;
+  }
+}
+
+@layer components {
+  /* Karte */
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-neutral-100 p-5;
+  }
+
+  /* Primär-Button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
+           bg-brand-500 text-white font-medium text-sm
+           hover:bg-brand-600 active:bg-brand-700
+           transition-colors duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2;
+  }
+
+  /* Sekundär-Button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
+           bg-white text-neutral-700 font-medium text-sm
+           border border-neutral-200
+           hover:bg-neutral-50 active:bg-neutral-100
+           transition-colors duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2;
+  }
+
+  /* Danger-Button */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
+           bg-red-500 text-white font-medium text-sm
+           hover:bg-red-600 active:bg-red-700
+           transition-colors duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Input-Feld */
+  .input {
+    @apply w-full px-4 py-2.5 rounded-xl border border-neutral-200 bg-white
+           text-sm text-neutral-900 placeholder-neutral-400
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           transition-shadow duration-150
+           disabled:opacity-50 disabled:bg-neutral-50 disabled:cursor-not-allowed;
+  }
+
+  /* Label */
+  .label {
+    @apply block text-sm font-medium text-neutral-700 mb-1.5;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* Seitennavigation (Mobile Bottom Nav) */
+  .bottom-nav-item {
+    @apply flex flex-col items-center gap-0.5 py-2 px-3 rounded-xl
+           text-neutral-500 text-xs font-medium
+           transition-colors duration-150;
+  }
+
+  .bottom-nav-item.active {
+    @apply text-brand-500;
+  }
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* PWA – Vollbild auf iOS */
+@supports (-webkit-touch-callout: none) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* React Day Picker Überschreibungen */
+.rdp {
+  --rdp-accent-color: #f97316 !important;
+  --rdp-background-color: #fff7ed !important;
+}

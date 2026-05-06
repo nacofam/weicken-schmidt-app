@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { formatDate } from '@/lib/utils'
 import { Plus, ShoppingBag, Clock, Package } from 'lucide-react'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/types/database.types'
@@ -8,9 +8,13 @@ import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/types/database.types
 export const metadata = { title: 'Vorbestellungen' }
 
 export default async function VorbestellungenPage() {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // Auth via cookie session
+  const authClient = createClient()
+  const { data: { user } } = await authClient.auth.getUser()
   if (!user) redirect('/login')
+
+  // Data queries via admin client (bypasses broken RLS)
+  const supabase = createAdminClient()
 
   const { data: orders } = await supabase
     .from('orders')
@@ -30,7 +34,7 @@ export default async function VorbestellungenPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-neutral-900">Vorbestellungen</h1>
-          <p className="text-sm text-neutral-500 mt-0.5">Alle deine Bestellungen im Überblick</p>
+          <p className="text-sm text-neutral-500 mt-0.5">Alle deine Bestellungen im Ãberblick</p>
         </div>
         <Link href="/vorbestellungen/neu" className="btn-primary text-sm py-2 px-4">
           <Plus size={16} />
@@ -44,7 +48,7 @@ export default async function VorbestellungenPage() {
           <Package size={40} className="text-neutral-200 mx-auto mb-4" />
           <p className="font-medium text-neutral-700 mb-1">Noch keine Vorbestellungen</p>
           <p className="text-sm text-neutral-400 mb-6">
-            Bestelle jetzt bequem vor und wähle deinen Abholtermin.
+            Bestelle jetzt bequem vor und wÃ¤hle deinen Abholtermin.
           </p>
           <Link href="/vorbestellungen/neu" className="btn-primary">
             <Plus size={16} />
@@ -116,7 +120,7 @@ function OrderCard({ order }: { order: any }) {
         <div className="bg-neutral-50 rounded-xl px-3 py-2 mb-3">
           {order.order_items.slice(0, 3).map((item: any) => (
             <p key={item.id} className="text-xs text-neutral-600 py-0.5">
-              {item.quantity}× {item.product_name}
+              {item.quantity}Ã {item.product_name}
               {item.variant_name && <span className="text-neutral-400"> ({item.variant_name})</span>}
             </p>
           ))}

@@ -5,13 +5,14 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/admin',               label: 'Übersicht',     exact: true },
-  { href: '/admin/bestellungen',  label: 'Bestellungen' },
-  { href: '/admin/farbanfragen',  label: 'Farbanfragen' },
-  { href: '/admin/verifizierung', label: 'Verifizierung' },
-  { href: '/admin/angebote',      label: 'Angebote' },
-  { href: '/admin/produkte',      label: 'Produkte' },
-  { href: '/admin/kunden',        label: 'Kunden' },
+  { href: '/admin',                label: 'Übersicht',      exact: true },
+  { href: '/admin/bestellungen',   label: 'Bestellungen' },
+  { href: '/admin/farbanfragen',   label: 'Farbanfragen' },
+  { href: '/admin/lieferscheine',  label: 'Lieferscheine' },
+  { href: '/admin/verifizierung',  label: 'Verifizierung' },
+  { href: '/admin/angebote',       label: 'Angebote' },
+  { href: '/admin/produkte',       label: 'Produkte' },
+  { href: '/admin/kunden',         label: 'Kunden' },
 ]
 
 export default function AdminNav() {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Tag, ShoppingBag, BookOpen, Shield } from 'lucide-react'
+import { LayoutDashboard, Tag, ShoppingBag, FileText, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface BottomNavProps {
@@ -16,7 +16,7 @@ export default function BottomNav({ isAdmin }: BottomNavProps) {
     { href: '/dashboard',      icon: LayoutDashboard, label: 'Start' },
     { href: '/angebote',       icon: Tag,              label: 'Angebote' },
     { href: '/vorbestellungen', icon: ShoppingBag,     label: 'Bestellen' },
-    { href: '/kataloge',       icon: BookOpen,         label: 'Kataloge' },
+    { href: '/lieferscheine',  icon: FileText,         label: 'Lieferscheine' },
     ...(isAdmin ? [{ href: '/admin', icon: Shield, label: 'Admin' }] : []),
   ]
 

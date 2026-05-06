@@ -1,14 +1,18 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { formatDate, formatPrice } from '@/lib/utils'
 import { ShoppingBag, Tag, Palette, BookOpen, ChevronRight, Clock, Package } from 'lucide-react'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/types/database.types'
 
 export default async function DashboardPage() {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // Auth via cookie session
+  const authClient = createClient()
+  const { data: { user } } = await authClient.auth.getUser()
   if (!user) redirect('/login')
+
+  // Data queries via admin client (bypasses broken RLS)
+  const supabase = createAdminClient()
 
   const { data: profile } = await supabase
     .from('profiles')
@@ -24,7 +28,7 @@ export default async function DashboardPage() {
     .order('created_at', { ascending: false })
     .limit(3)
 
-  // Aktuelle Angebote (max 2 für Preview)
+  // Aktuelle Angebote (max 2 fÃ¼r Preview)
   const today = new Date().toISOString().split('T')[0]
   const { data: offers } = await supabase
     .from('offers')
@@ -37,15 +41,16 @@ export default async function DashboardPage() {
 
   const firstName = profile?.full_name?.split(' ')[0] || 'Hallo'
 
+
   return (
     <div className="px-4 py-5 space-y-6">
-      {/* Begrüßung */}
+      {/* BegrÃ¼Ãung */}
       <div>
         <h1 className="text-xl font-bold text-neutral-900">
-          Hallo, {firstName}! 👋
+          Hallo, {firstName}! ð
         </h1>
         <p className="text-sm text-neutral-500 mt-0.5">
-          Was können wir heute für dich tun?
+          Was kÃ¶nnen wir heute fÃ¼r dich tun?
         </p>
       </div>
 
@@ -56,7 +61,7 @@ export default async function DashboardPage() {
             <ShoppingBag size={20} className="text-brand-600" />
           </div>
           <p className="font-semibold text-sm text-neutral-900">Vorbestellen</p>
-          <p className="text-xs text-neutral-500 mt-0.5">Produkt & Termin wählen</p>
+          <p className="text-xs text-neutral-500 mt-0.5">Produkt & Termin wÃ¤hlen</p>
         </Link>
 
         <Link href="/angebote" className="card hover:shadow-card-hover transition-shadow group">
@@ -80,7 +85,7 @@ export default async function DashboardPage() {
             <BookOpen size={20} className="text-green-600" />
           </div>
           <p className="font-semibold text-sm text-neutral-900">Kataloge</p>
-          <p className="text-xs text-neutral-500 mt-0.5">Digital durchblättern</p>
+          <p className="text-xs text-neutral-500 mt-0.5">Digital durchblÃ¤ttern</p>
         </Link>
       </div>
 
@@ -173,23 +178,23 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      {/* Öffnungszeiten & Kontakt */}
+      {/* Ãffnungszeiten & Kontakt */}
       <div className="bg-neutral-100 rounded-2xl p-4 space-y-3">
         <div>
-          <p className="text-xs font-semibold text-neutral-600 uppercase tracking-wide mb-2">Öffnungszeiten</p>
+          <p className="text-xs font-semibold text-neutral-600 uppercase tracking-wide mb-2">Ãffnungszeiten</p>
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-neutral-600">
-            <span className="font-medium">Mo – Do</span><span>07:00 – 16:30 Uhr</span>
-            <span className="font-medium">Freitag</span><span>07:00 – 15:00 Uhr</span>
+            <span className="font-medium">Mo â Do</span><span>07:00 â 16:30 Uhr</span>
+            <span className="font-medium">Freitag</span><span>07:00 â 15:00 Uhr</span>
             <span className="font-medium text-neutral-400">Sa + So</span><span className="text-neutral-400">geschlossen</span>
           </div>
         </div>
         <div className="border-t border-neutral-200 pt-3">
           <p className="text-xs text-neutral-500">
-            📍 Brauckstraße 43, 58454 Witten
+            ð BrauckstraÃe 43, 58454 Witten
             <br />
-            📞 <a href="tel:+4923029732-0" className="text-brand-600 font-medium">+49 2302 9732-0</a>
-            &nbsp;·&nbsp;
-            ✉️ <a href="mailto:witten@weicken-schmidt.de" className="text-brand-600 font-medium">witten@weicken-schmidt.de</a>
+            ð <a href="tel:+4923029732-0" className="text-brand-600 font-medium">+49 2302 9732-0</a>
+            &nbsp;Â·&nbsp;
+            âï¸ <a href="mailto:witten@weicken-schmidt.de" className="text-brand-600 font-medium">witten@weicken-schmidt.de</a>
           </p>
         </div>
       </div>

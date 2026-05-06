@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from "@/lib/supabase/server"
 import Image from 'next/image'
 import { Tag, Calendar } from 'lucide-react'
 import { formatDate, formatPrice } from '@/lib/utils'
@@ -6,7 +6,7 @@ import { formatDate, formatPrice } from '@/lib/utils'
 export const metadata = { title: 'Angebote' }
 
 export default async function AngebotePage() {
-  const supabase = createClient()
+  const supabase = createAdminClient()
   const today = new Date().toISOString().split('T')[0]
 
   const { data: offers } = await supabase

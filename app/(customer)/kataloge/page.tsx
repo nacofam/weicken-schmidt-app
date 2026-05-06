@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from "@/lib/supabase/server"
 import { BookOpen, Download, ExternalLink } from 'lucide-react'
 import { formatDate } from '@/lib/utils'
 
 export const metadata = { title: 'Kataloge' }
 
 export default async function KatalogePage() {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const { data: catalogs } = await supabase
     .from('catalogs')

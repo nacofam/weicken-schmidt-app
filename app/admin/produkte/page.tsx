@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { Plus, Package } from 'lucide-react'
+import { Plus, Package, Upload } from 'lucide-react'
 import ToggleProductButton from '@/components/admin/ToggleProductButton'
 
 export const metadata = { title: 'Produkte' }
@@ -25,19 +25,31 @@ export default async function AdminProdukePage() {
             {products?.filter(p => p.active).length || 0} aktiv
           </p>
         </div>
-        <Link href="/admin/produkte/neu" className="btn-primary text-sm">
-          <Plus size={15} />
-          Neu
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/produkte/import" className="btn-secondary text-sm flex items-center gap-1.5">
+            <Upload size={14} />
+            Import
+          </Link>
+          <Link href="/admin/produkte/neu" className="btn-primary text-sm">
+            <Plus size={15} />
+            Neu
+          </Link>
+        </div>
       </div>
 
       {!products || products.length === 0 ? (
         <div className="card text-center py-10">
           <Package size={36} className="text-neutral-200 mx-auto mb-3" />
           <p className="text-sm text-neutral-500 mb-4">Noch keine Produkte angelegt.</p>
-          <Link href="/admin/produkte/neu" className="btn-primary text-sm">
-            Erstes Produkt erstellen
-          </Link>
+          <div className="flex flex-col items-center gap-2">
+            <Link href="/admin/produkte/neu" className="btn-primary text-sm">
+              Erstes Produkt erstellen
+            </Link>
+            <Link href="/admin/produkte/import" className="text-sm text-brand-600 font-medium flex items-center gap-1">
+              <Upload size={13} />
+              Oder per CSV importieren
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-6">

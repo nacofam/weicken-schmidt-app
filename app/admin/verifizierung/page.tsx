@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/server'
-import { ShieldCheck, ShieldOff, ShieldAlert, Clock } from 'lucide-react'
+import { ShieldCheck, ShieldOff, ShieldAlert, Clock, QrCode } from 'lucide-react'
 import { formatDateTime } from '@/lib/utils'
+import Image from 'next/image'
 import {
   VERIFICATION_CODE_STATUS_LABELS,
   VERIFICATION_CODE_STATUS_COLORS,
@@ -10,6 +11,8 @@ import GenerateVerificationCode from '@/components/admin/GenerateVerificationCod
 import RevokeVerificationCode from '@/components/admin/RevokeVerificationCode'
 
 export const metadata = { title: 'Verifizierung' }
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://weicken-schmidt-app.vercel.app'
 
 export default async function AdminVerifizierungPage() {
   const supabase = createAdminClient()
@@ -24,8 +27,8 @@ export default async function AdminVerifizierungPage() {
     `)
     .order('created_at', { ascending: false })
 
-  const unused  = codes?.filter(c => c.status === 'unused')  || []
-  const active  = codes?.filter(c => c.status === 'active')  || []
+  const unused = codes?.filter(c => c.status === 'unused') || []
+  const active = codes?.filter(c => c.status === 'active') || []
   const revoked = codes?.filter(c => c.status === 'revoked') || []
 
   return (
@@ -76,7 +79,7 @@ export default async function AdminVerifizierungPage() {
         </div>
       </div>
 
-      {/* Aktive Codes (eingelöst) */}
+      {/* Aktive Codes */}
       {active.length > 0 && (
         <section>
           <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-3">
@@ -84,13 +87,13 @@ export default async function AdminVerifizierungPage() {
           </h2>
           <div className="space-y-2">
             {active.map((code: any) => (
-              <CodeCard key={code.id} code={code} showRevoke />
+              <CodeCard key={code.id} code={code} showRevoke appUrl={APP_URL} />
             ))}
           </div>
         </section>
       )}
 
-      {/* Offene Codes (noch nicht eingelöst) */}
+      {/* Offene Codes */}
       {unused.length > 0 && (
         <section>
           <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-3">
@@ -98,7 +101,7 @@ export default async function AdminVerifizierungPage() {
           </h2>
           <div className="space-y-2">
             {unused.map((code: any) => (
-              <CodeCard key={code.id} code={code} showRevoke={false} />
+              <CodeCard key={code.id} code={code} showRevoke={false} showQr appUrl={APP_URL} />
             ))}
           </div>
         </section>
@@ -112,13 +115,12 @@ export default async function AdminVerifizierungPage() {
           </h2>
           <div className="space-y-2 opacity-60">
             {revoked.map((code: any) => (
-              <CodeCard key={code.id} code={code} showRevoke={false} />
+              <CodeCard key={code.id} code={code} showRevoke={false} appUrl={APP_URL} />
             ))}
           </div>
         </section>
       )}
 
-      {/* Leer-Zustand */}
       {(!codes || codes.length === 0) && (
         <div className="card text-center py-10">
           <ShieldAlert size={36} className="text-neutral-200 mx-auto mb-3" />
@@ -132,21 +134,31 @@ export default async function AdminVerifizierungPage() {
   )
 }
 
-function CodeCard({ code, showRevoke }: { code: any; showRevoke: boolean }) {
+function CodeCard({
+  code,
+  showRevoke,
+  showQr = false,
+  appUrl,
+}: {
+  code: any
+  showRevoke: boolean
+  showQr?: boolean
+  appUrl: string
+}) {
   const statusColor = VERIFICATION_CODE_STATUS_COLORS[code.status as VerificationCodeStatus]
   const statusLabel = VERIFICATION_CODE_STATUS_LABELS[code.status as VerificationCodeStatus]
   const customer = code.activated_profile
 
+  const verifyUrl = `${appUrl}/farbmischung?code=${encodeURIComponent(code.code)}`
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&margin=8&data=${encodeURIComponent(verifyUrl)}`
+
   return (
-    <div className="card space-y-2">
+    <div className="card space-y-3">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          {/* Code */}
           <p className="font-mono font-bold text-sm tracking-wider text-neutral-800">
             {code.code}
           </p>
-
-          {/* Kunde (wenn eingelöst) */}
           {customer && (
             <p className="text-xs text-neutral-600 mt-0.5">
               {customer.full_name || customer.email}
@@ -155,15 +167,37 @@ function CodeCard({ code, showRevoke }: { code: any; showRevoke: boolean }) {
               )}
             </p>
           )}
-
-          {/* Notiz */}
           {code.notes && (
             <p className="text-xs text-neutral-400 italic mt-0.5">„{code.notes}"</p>
           )}
         </div>
-
         <span className={`badge shrink-0 ${statusColor}`}>{statusLabel}</span>
       </div>
+
+      {/* QR Code für ungenutzte Codes */}
+      {showQr && (
+        <div className="bg-neutral-50 rounded-xl p-3 flex items-center gap-4">
+          <div className="bg-white rounded-xl p-1.5 shadow-sm shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={qrApiUrl}
+              alt={`QR-Code für ${code.code}`}
+              width={80}
+              height={80}
+              className="rounded-lg"
+            />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5 mb-1">
+              <QrCode size={13} className="text-brand-500" />
+              <p className="text-xs font-semibold text-neutral-700">QR-Code für Kunden</p>
+            </div>
+            <p className="text-xs text-neutral-500 leading-relaxed">
+              Zeige diesen Code dem Kunden. Er scannt ihn mit der Kamera und wird direkt zur Verifizierung weitergeleitet.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Zeitstempel */}
       <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -182,7 +216,6 @@ function CodeCard({ code, showRevoke }: { code: any; showRevoke: boolean }) {
         )}
       </div>
 
-      {/* Zugang entziehen */}
       {showRevoke && (
         <RevokeVerificationCode
           codeId={code.id}

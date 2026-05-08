@@ -93,7 +93,6 @@ function hexToRgb(hex: string): [number, number, number] {
 }
 
 function colorDistance(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): number {
-  // Weighted Euclidean distance (human perception)
   const dr = r1 - r2, dg = g1 - g2, db = b1 - b2
   return Math.sqrt(2 * dr * dr + 4 * dg * dg + 3 * db * db)
 }
@@ -113,6 +112,21 @@ function rgbToHex(r: number, g: number, b: number): string {
   return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('')
 }
 
+// Check if camera is available in this browser
+function isCameraSupported(): boolean {
+  return !!(
+    typeof navigator !== 'undefined' &&
+    navigator.mediaDevices &&
+    typeof navigator.mediaDevices.getUserMedia === 'function'
+  )
+}
+
+// iOS Safari needs special handling
+function isIOS(): boolean {
+  if (typeof navigator === 'undefined') return false
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+}
+
 interface Props {
   onColorDetected: (color: ScannedColor, rawHex: string) => void
 }
@@ -121,6 +135,7 @@ export default function ColorScanner({ onColorDetected }: Props) {
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [preview, setPreview] = useState<{ color: ScannedColor; rawHex: string } | null>(null)
+  const [cameraReady, setCameraReady] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -128,23 +143,64 @@ export default function ColorScanner({ onColorDetected }: Props) {
   const startCamera = useCallback(async () => {
     setError(null)
     setPreview(null)
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
-      })
-      streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        await videoRef.current.play()
+    setCameraReady(false)
+
+    if (!isCameraSupported()) {
+      setError('Kamera wird von diesem Browser nicht unterstützt. Bitte Chrome oder Safari verwenden.')
+      return
+    }
+
+    // Try back camera first, fall back to any camera (important for iOS)
+    const constraints: MediaStreamConstraints[] = [
+      { video: { facingMode: { exact: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } },
+      { video: { facingMode: 'environment' } },
+      { video: true },
+    ]
+
+    let stream: MediaStream | null = null
+    let lastError: Error | null = null
+
+    for (const constraint of constraints) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraint)
+        break
+      } catch (err) {
+        lastError = err as Error
+        continue
       }
-    } catch {
-      setError('Kamera konnte nicht geöffnet werden. Bitte Kamera-Berechtigung erteilen.')
+    }
+
+    if (!stream) {
+      const msg = lastError?.name === 'NotAllowedError' || lastError?.name === 'PermissionDeniedError'
+        ? 'Kamera-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.'
+        : lastError?.name === 'NotFoundError' || lastError?.name === 'DevicesNotFoundError'
+        ? 'Keine Kamera gefunden.'
+        : isIOS()
+        ? 'Kamera konnte nicht geöffnet werden. Bitte Safari verwenden und Kamera-Zugriff erlauben.'
+        : 'Kamera konnte nicht geöffnet werden. Bitte Kamera-Berechtigung erteilen.'
+      setError(msg)
+      return
+    }
+
+    streamRef.current = stream
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream
+      // iOS Safari requires a user-gesture triggered play
+      try {
+        await videoRef.current.play()
+        setCameraReady(true)
+      } catch {
+        // On iOS, play may fail if not triggered by user gesture
+        // The onCanPlay event will handle this
+      }
     }
   }, [])
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach(t => t.stop())
     streamRef.current = null
+    setCameraReady(false)
   }, [])
 
   useEffect(() => {
@@ -156,19 +212,27 @@ export default function ColorScanner({ onColorDetected }: Props) {
     const video = videoRef.current
     const canvas = canvasRef.current
     if (!video || !canvas) return
+    if (video.readyState < 2) {
+      setError('Kamera noch nicht bereit. Bitte kurz warten.')
+      return
+    }
 
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
+    const w = video.videoWidth || video.clientWidth
+    const h = video.videoHeight || video.clientHeight
+    canvas.width = w
+    canvas.height = h
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    ctx.drawImage(video, 0, 0)
+    ctx.drawImage(video, 0, 0, w, h)
 
-    // Sample a 20×20 px region at the center
-    const cx = Math.floor(canvas.width / 2)
-    const cy = Math.floor(canvas.height / 2)
+    // Sample 20×20 px at center
+    const cx = Math.floor(w / 2)
+    const cy = Math.floor(h / 2)
     const sampleSize = 20
-    const data = ctx.getImageData(cx - sampleSize / 2, cy - sampleSize / 2, sampleSize, sampleSize).data
+    const x0 = Math.max(0, cx - sampleSize / 2)
+    const y0 = Math.max(0, cy - sampleSize / 2)
+    const data = ctx.getImageData(x0, y0, sampleSize, sampleSize).data
 
     let r = 0, g = 0, b = 0
     const pixelCount = sampleSize * sampleSize
@@ -198,6 +262,11 @@ export default function ColorScanner({ onColorDetected }: Props) {
     setPreview(null)
     setError(null)
   }, [stopCamera])
+
+  // Don't render scanner button if camera not supported at all
+  if (!isCameraSupported() && typeof window !== 'undefined') {
+    return null
+  }
 
   if (!open) {
     return (
@@ -235,7 +304,17 @@ export default function ColorScanner({ onColorDetected }: Props) {
             <div>
               <AlertCircle size={40} className="text-red-400 mx-auto mb-3" />
               <p className="text-white text-sm">{error}</p>
-              <button onClick={close} className="mt-4 px-4 py-2 bg-white/20 text-white rounded-xl text-sm">Schließen</button>
+              <div className="flex gap-3 mt-4 justify-center">
+                <button
+                  onClick={() => { setError(null); startCamera() }}
+                  className="px-4 py-2 bg-white/20 text-white rounded-xl text-sm"
+                >
+                  Erneut versuchen
+                </button>
+                <button onClick={close} className="px-4 py-2 bg-white/10 text-white/60 rounded-xl text-sm">
+                  Schließen
+                </button>
+              </div>
             </div>
           </div>
         ) : (
@@ -245,26 +324,49 @@ export default function ColorScanner({ onColorDetected }: Props) {
               autoPlay
               playsInline
               muted
+              // iOS Safari: webkit-playsinline attribute
+              {...({ 'webkit-playsinline': 'true' } as any)}
+              onCanPlay={() => setCameraReady(true)}
+              onLoadedMetadata={async () => {
+                if (videoRef.current) {
+                  try {
+                    await videoRef.current.play()
+                    setCameraReady(true)
+                  } catch { /* ignore */ }
+                }
+              }}
               className="w-full h-full object-cover"
             />
 
-            {/* Crosshair overlay */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="relative w-24 h-24">
-                {/* Corner brackets */}
-                <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-white rounded-tl-sm" />
-                <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-white rounded-tr-sm" />
-                <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-white rounded-bl-sm" />
-                <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-white rounded-br-sm" />
-                {/* Center dot */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-white/80" />
+            {/* Loading overlay */}
+            {!cameraReady && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/60">
+                <div className="text-center">
+                  <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-3" />
+                  <p className="text-white/70 text-sm">Kamera wird gestartet…</p>
                 </div>
               </div>
-              <div className="absolute bottom-8 left-0 right-0 flex justify-center">
-                <p className="text-white/70 text-xs bg-black/40 px-3 py-1 rounded-full">Fadenkreuz auf Farbe ausrichten</p>
+            )}
+
+            {/* Crosshair overlay */}
+            {cameraReady && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="relative w-24 h-24">
+                  <div className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-white rounded-tl-sm" />
+                  <div className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-white rounded-tr-sm" />
+                  <div className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-white rounded-bl-sm" />
+                  <div className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-white rounded-br-sm" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-white/80" />
+                  </div>
+                </div>
+                <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+                  <p className="text-white/70 text-xs bg-black/40 px-3 py-1 rounded-full">
+                    Fadenkreuz auf Farbe ausrichten
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </div>
@@ -291,8 +393,8 @@ export default function ColorScanner({ onColorDetected }: Props) {
       )}
 
       {/* Capture button */}
-      {!error && !preview && (
-        <div className="pb-safe px-6 pb-8 pt-4 flex justify-center">
+      {!error && !preview && cameraReady && (
+        <div className="px-6 pb-8 pt-4 flex justify-center">
           <button
             onClick={capture}
             className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"

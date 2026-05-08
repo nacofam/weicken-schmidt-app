@@ -80,6 +80,7 @@ function ColorRequestCard({ request }: { request: any }) {
 
   return (
     <div className="card space-y-3">
+      {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-semibold text-sm text-neutral-900">
@@ -90,6 +91,7 @@ function ColorRequestCard({ request }: { request: any }) {
         <span className={`badge shrink-0 ${statusColor}`}>{statusLabel}</span>
       </div>
 
+      {/* Farbe */}
       <div className="bg-purple-50 rounded-xl p-3 space-y-1">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-purple-700 w-20">System:</span>
@@ -123,12 +125,14 @@ function ColorRequestCard({ request }: { request: any }) {
         )}
       </div>
 
+      {/* Kundennotiz */}
       {request.notes && (
         <div className="bg-neutral-50 rounded-xl px-3 py-2">
           <p className="text-xs text-neutral-500 italic">"{request.notes}"</p>
         </div>
       )}
 
+      {/* Kontakt */}
       <div className="flex gap-3">
         {request.profiles?.email && (
           <a href={`mailto:${request.profiles.email}`} className="flex items-center gap-1.5 text-xs text-brand-600 hover:underline">
@@ -142,6 +146,7 @@ function ColorRequestCard({ request }: { request: any }) {
         )}
       </div>
 
+      {/* Status-Update */}
       {!['picked_up', 'cancelled'].includes(request.status) && (
         <UpdateColorRequestStatus requestId={request.id} currentStatus={request.status} />
       )}

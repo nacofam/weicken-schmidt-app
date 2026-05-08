@@ -61,6 +61,22 @@ export default function AdminOrderActions({ order }: { order: any }) {
       toast.error('Statusänderung fehlgeschlagen.')
     } else {
       toast.success(`Status: ${ORDER_STATUS_LABELS[newStatus]}`)
+
+      // Send email notification when order is ready for pickup
+      if (newStatus === 'ready') {
+        try {
+          await fetch('/api/order-notification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId: order.id }),
+          })
+          toast.success('Kunde per E-Mail benachrichtigt.', { icon: '📧' })
+        } catch {
+          // Notification failure is non-critical
+          console.warn('E-Mail Benachrichtigung fehlgeschlagen.')
+        }
+      }
+
       router.refresh()
     }
     setLoading(null)
@@ -109,6 +125,9 @@ export default function AdminOrderActions({ order }: { order: any }) {
                   <Icon size={17} />
                 )}
                 {action.label}
+                {action.to === 'ready' && (
+                  <span className="ml-auto text-xs opacity-70">📧 E-Mail</span>
+                )}
               </button>
             )
           })}

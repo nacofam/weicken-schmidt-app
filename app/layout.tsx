@@ -18,8 +18,9 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'W&S',
+    startupImage: [],
   },
   formatDetection: {
     telephone: false,
@@ -39,6 +40,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({
@@ -49,7 +51,16 @@ export default function RootLayout({
   return (
     <html lang="de" className={inter.variable}>
       <head>
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
+        {/* iOS PWA icons */}
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192" />
+        <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-192" />
+        <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-192" />
+        {/* iOS Safari splash screens */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="W&S" />
+        {/* Prevent iOS phone number detection */}
+        <meta name="format-detection" content="telephone=no" />
       </head>
       <body className="min-h-screen">
         {children}

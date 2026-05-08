@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Send, Droplets, ChevronLeft, X } from 'lucide-react'
 import toast from 'react-hot-toast'
+import ColorScanner, { type ScannedColor } from './ColorScanner'
 
 // ─── Basis-Produkte (Farbeimer) ───────────────────────────────────────────────
 const PAINT_BASES = [
@@ -290,6 +291,16 @@ export default function FarbmischungForm() {
     setLightbox(null)
   }
 
+
+  const handleScannedColor = (color: ScannedColor) => {
+    setForm(f => ({
+      ...f,
+      color_system: color.system,
+      color_code: color.code,
+      color_name: color.name,
+    }))
+    toast.success('Farbe erkannt: ' + color.code)
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.color_code && !form.color_name) {
@@ -390,7 +401,8 @@ export default function FarbmischungForm() {
             Farbe aus Farbkarte wählen
           </p>
           <p className="text-xs text-neutral-400 mb-3">Tippe auf eine Farbe für die Detailansicht.</p>
-          <div className="flex gap-1.5 overflow-x-auto pb-1 mb-3">
+                  <ColorScanner onColorDetected={handleScannedColor} />
+        <div className="flex gap-1.5 overflow-x-auto pb-1 mb-3">
             {COLOR_TABS.map(tab => (
               <button key={tab.id} type="button" onClick={() => setActiveTab(tab.id)}
                 className={'flex-none px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ' + (activeTab === tab.id ? 'bg-purple-600 text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200')}

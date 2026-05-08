@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Tag, ShoppingBag, FileText, Shield } from 'lucide-react'
+import { LayoutDashboard, Tag, ShoppingBag, FileText, Calculator, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface BottomNavProps {
@@ -13,10 +13,11 @@ export default function BottomNav({ isAdmin }: BottomNavProps) {
   const pathname = usePathname()
 
   const items = [
-    { href: '/dashboard',      icon: LayoutDashboard, label: 'Start' },
-    { href: '/angebote',       icon: Tag,              label: 'Angebote' },
-    { href: '/vorbestellungen', icon: ShoppingBag,     label: 'Bestellen' },
-    { href: '/lieferscheine',  icon: FileText,         label: 'Lieferscheine' },
+    { href: '/dashboard', icon: LayoutDashboard, label: 'Start' },
+    { href: '/angebote', icon: Tag, label: 'Angebote' },
+    { href: '/vorbestellungen', icon: ShoppingBag, label: 'Bestellen' },
+    { href: '/farbrechner', icon: Calculator, label: 'Rechner' },
+    { href: '/lieferscheine', icon: FileText, label: 'Lieferscheine' },
     ...(isAdmin ? [{ href: '/admin', icon: Shield, label: 'Admin' }] : []),
   ]
 

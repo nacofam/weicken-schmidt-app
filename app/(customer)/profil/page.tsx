@@ -7,6 +7,7 @@ import toast from 'react-hot-toast'
 import { User, Phone, Mail, Hash, Save, Palette, ChevronRight, Clock } from 'lucide-react'
 import Link from 'next/link'
 import type { Profile } from '@/types/database.types'
+import PushSubscribeButton from '@/components/PushSubscribeButton'
 
 const STATUS_LABELS: Record<string, string> = {
   pending: 'Ausstehend',
@@ -142,6 +143,15 @@ export default function ProfilPage() {
           {loading ? 'Speichern…' : <><Save size={15} /> Profil speichern</>}
         </button>
       </form>
+
+      {/* Push-Benachrichtigungen */}
+      <section className="card">
+        <h2 className="font-semibold text-neutral-800 mb-2 text-sm">Benachrichtigungen</h2>
+        <p className="text-xs text-neutral-500 mb-3">
+          Erhalte eine Push-Benachrichtigung, sobald deine Bestellung abholbereit ist.
+        </p>
+        <PushSubscribeButton />
+      </section>
 
       {/* Farbhistorie */}
       <section className="space-y-3">

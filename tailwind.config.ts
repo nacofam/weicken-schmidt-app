@@ -9,18 +9,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Weicken & Schmidt Markenfarbe: Petrol-Blau #247091
         brand: {
-          50:  '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316', // Primary orange (Farben/Handwerk)
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
-          950: '#431407',
+          50:  '#eef7fa',
+          100: '#d6ebf4',
+          200: '#add8ea',
+          300: '#78bedd',
+          400: '#43a5d0',
+          500: '#247091', // W&S Primärfarbe
+          600: '#1d5c78',
+          700: '#174a60',
+          800: '#113848',
+          900: '#0d2935',
+          950: '#081920',
         },
         neutral: {
           50:  '#fafafa',

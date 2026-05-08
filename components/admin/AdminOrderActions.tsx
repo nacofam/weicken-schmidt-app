@@ -62,8 +62,9 @@ export default function AdminOrderActions({ order }: { order: any }) {
     } else {
       toast.success(`Status: ${ORDER_STATUS_LABELS[newStatus]}`)
 
-      // Send email notification when order is ready for pickup
+      // When order is ready: send E-Mail + Push notification
       if (newStatus === 'ready') {
+        // E-Mail
         try {
           await fetch('/api/order-notification', {
             method: 'POST',
@@ -72,8 +73,27 @@ export default function AdminOrderActions({ order }: { order: any }) {
           })
           toast.success('Kunde per E-Mail benachrichtigt.', { icon: '📧' })
         } catch {
-          // Notification failure is non-critical
           console.warn('E-Mail Benachrichtigung fehlgeschlagen.')
+        }
+
+        // Push notification
+        try {
+          const pushRes = await fetch('/api/send-push', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: order.user_id,
+              title: '🎨 Deine Bestellung ist abholbereit!',
+              message: 'Weicken & Schmidt: Deine Vorbestellung kann jetzt abgeholt werden.',
+              url: `/vorbestellungen/${order.id}`,
+            }),
+          })
+          const pushData = await pushRes.json()
+          if (pushData.sent && pushData.notifications_sent > 0) {
+            toast.success('Push-Benachrichtigung gesendet.', { icon: '🔔' })
+          }
+        } catch {
+          // Push failure is non-critical
         }
       }
 
@@ -126,7 +146,7 @@ export default function AdminOrderActions({ order }: { order: any }) {
                 )}
                 {action.label}
                 {action.to === 'ready' && (
-                  <span className="ml-auto text-xs opacity-70">📧 E-Mail</span>
+                  <span className="ml-auto text-xs opacity-70">📧 🔔</span>
                 )}
               </button>
             )

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" width="280" height="64">
+
+  <!-- Farbstreifen links – Malerfarben-Motiv wie im echten W&S Logo -->
+  <rect x="0" y="8"  width="7" height="48" fill="#4caf50" rx="1.5"/>
+  <rect x="9" y="8"  width="7" height="48" fill="#8bc34a" rx="1.5"/>
+  <rect x="18" y="8" width="7" height="48" fill="#e53935" rx="1.5"/>
+  <rect x="27" y="8" width="7" height="48" fill="#b71c1c" rx="1.5"/>
+  <rect x="36" y="8" width="7" height="48" fill="#ffc107" rx="1.5"/>
+  <rect x="45" y="8" width="7" height="48" fill="#9c27b0" rx="1.5"/>
+
+  <!-- Trennlinie -->
+  <line x1="62" y1="10" x2="62" y2="54" stroke="#d4d4d4" stroke-width="1.5"/>
+
+  <!-- Firmenname -->
+  <text x="72" y="29" font-family="Arial Black, Arial, sans-serif" font-size="15" font-weight="900" fill="#19212b" letter-spacing="0.5">WEICKEN &amp; SCHMIDT</text>
+
+  <!-- Tagline -->
+  <text x="73" y="47" font-family="Arial, sans-serif" font-size="10" fill="#247091" letter-spacing="1.5" font-weight="600">ALLES FÜR MALER UND MACHER</text>
+
+</svg>

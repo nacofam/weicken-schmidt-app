@@ -2,25 +2,30 @@
   "name": "Weicken & Schmidt",
   "short_name": "W&S",
   "description": "Ihr Fachgeschäft für Farben & Malerbedarf in Witten",
-  "start_url": "/",
+  "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#f97316",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
+      "src": "/icons/icon-192",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/icons/icon-512",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
   "categories": ["shopping", "business"],
-  "lang": "de"
+  "lang": "de",
+  "shortcuts": [
+    { "name": "Vorbestellungen", "url": "/vorbestellungen" },
+    { "name": "Farbmischservice", "url": "/farbmischung" },
+    { "name": "Mengenrechner", "url": "/farbrechner" }
+  ]
 }

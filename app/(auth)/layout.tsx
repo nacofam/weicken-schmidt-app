@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft } from 'lucide-react'
 
 export default function AuthLayout({
@@ -7,7 +8,7 @@ export default function AuthLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-orange-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-100 flex flex-col">
       {/* Top-Nav */}
       <nav className="px-4 pt-4">
         <Link
@@ -20,13 +21,15 @@ export default function AuthLayout({
       </nav>
 
       {/* Logo */}
-      <div className="text-center pt-8 pb-2">
-        <div className="inline-flex items-center justify-center w-14 h-14 bg-brand-500 rounded-2xl shadow-lg mb-3">
-          <span className="text-white font-bold text-xl">W&S</span>
-        </div>
-        <p className="text-xs text-neutral-500 font-medium tracking-wide uppercase">
-          Weicken & Schmidt · Witten
-        </p>
+      <div className="flex justify-center pt-8 pb-2">
+        <Image
+          src="/ws-logo.svg"
+          alt="Weicken & Schmidt"
+          width={220}
+          height={50}
+          priority
+          className="h-12 w-auto"
+        />
       </div>
 
       {/* Content */}

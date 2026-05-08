@@ -4,8 +4,9 @@
 
 @layer base {
   :root {
-    --brand: #f97316;
-    --brand-dark: #ea580c;
+    /* Weicken & Schmidt Markenfarben */
+    --brand: #247091;
+    --brand-dark: #1d5c78;
   }
 
   html {
@@ -100,8 +101,8 @@ html {
   }
 }
 
-/* React Day Picker Überschreibungen */
+/* React Day Picker – W&S Teal */
 .rdp {
-  --rdp-accent-color: #f97316 !important;
-  --rdp-background-color: #fff7ed !important;
+  --rdp-accent-color: #247091 !important;
+  --rdp-background-color: #eef7fa !important;
 }

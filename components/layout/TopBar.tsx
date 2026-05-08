@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { LogOut, User, Settings, ChevronDown } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -29,13 +30,15 @@ export default function TopBar({ profile }: TopBarProps) {
     <header className="bg-white border-b border-neutral-100 sticky top-0 z-40">
       <div className="px-4 h-14 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xs">W&S</span>
-          </div>
-          <span className="font-semibold text-sm text-neutral-800 hidden sm:block">
-            Weicken & Schmidt
-          </span>
+        <Link href="/dashboard" className="flex items-center">
+          <Image
+            src="/ws-logo.svg"
+            alt="Weicken & Schmidt"
+            width={180}
+            height={40}
+            priority
+            className="h-9 w-auto"
+          />
         </Link>
 
         {/* User Menu */}

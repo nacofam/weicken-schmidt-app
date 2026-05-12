@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ShoppingBag, Tag, Palette, BookOpen, ChevronRight, MapPin, Clock, Phone, Mail } from 'lucide-react'
 
 export default function HomePage() {
@@ -8,9 +9,7 @@ export default function HomePage() {
       <header className="bg-white border-b border-neutral-100 sticky top-0 z-50">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">W&S</span>
-            </div>
+            <Image src="/ws-logo.svg" alt="Weicken & Schmidt Logo" width={36} height={36} />
             <span className="font-semibold text-neutral-900 text-sm">Weicken & Schmidt</span>
           </div>
           <div className="flex items-center gap-2">
@@ -36,7 +35,7 @@ export default function HomePage() {
             <span className="text-brand-100">Malerbedarf online bestellen</span>
           </h1>
           <p className="text-brand-100 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
-            Ihr Fachhandel in Witten. Vorbestellungen, individuelle Farbmischungen und aktuelle Angebote – direkt auf dem Handy.
+            Dein Fachhandel in Witten. Vorbestellungen, individuelle Farbmischungen und aktuelle Angebote – direkt auf dem Handy.
           </p>
           <Link href="/register" className="inline-flex items-center gap-2 bg-white text-brand-600 font-semibold px-6 py-3 rounded-xl hover:bg-brand-50 transition-colors">
             Jetzt kostenlos registrieren
@@ -58,7 +57,7 @@ export default function HomePage() {
               icon: ShoppingBag,
               title: 'Vorbestellungen',
               desc: 'Produkte vorbestellen & Abholtermin wählen',
-              color: 'bg-orange-50 text-brand-500',
+              color: 'bg-brand-50 text-brand-500',
             },
             {
               icon: Tag,

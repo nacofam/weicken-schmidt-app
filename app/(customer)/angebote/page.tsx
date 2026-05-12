@@ -23,17 +23,19 @@ export default async function AngebotePage() {
       <div className="mb-5">
         <h1 className="text-xl font-bold text-neutral-900">Aktuelle Angebote</h1>
         <p className="text-sm text-neutral-500 mt-0.5">
-          Entdecken Sie unsere aktuellen Aktionen & Sonderpreise
+          Entdecke unsere aktuellen Aktionen & Sonderpreise
         </p>
       </div>
 
       {/* Angebote */}
       {!offers || offers.length === 0 ? (
-        <div className="card text-center py-12">
-          <Tag size={40} className="text-neutral-200 mx-auto mb-4" />
-          <p className="font-medium text-neutral-600 mb-1">Aktuell keine Angebote</p>
-          <p className="text-sm text-neutral-400">
-            Schau bald wieder vorbei – wir haben regelmäßig neue Aktionen.
+        <div className="card text-center py-14">
+          <div className="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Tag size={32} className="text-brand-400" />
+          </div>
+          <p className="font-semibold text-neutral-800 mb-1">Aktuell keine Angebote</p>
+          <p className="text-sm text-neutral-400 max-w-xs mx-auto">
+            Schau bald wieder vorbei – wir haben regelmäßig neue Aktionen für dich.
           </p>
         </div>
       ) : (
@@ -116,8 +118,8 @@ export default async function AngebotePage() {
       {/* Info-Footer */}
       <div className="mt-6 bg-brand-50 rounded-2xl p-4">
         <p className="text-xs text-brand-700 text-center">
-          💡 Alle Preise gelten solange der Vorrat reicht.
-          Bei Fragen helfen wir gerne persönlich weiter.
+          Alle Preise gelten solange der Vorrat reicht.
+          Bei Fragen helfen wir dir gerne persönlich weiter.
         </p>
       </div>
     </div>

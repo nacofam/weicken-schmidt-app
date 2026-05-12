@@ -34,7 +34,12 @@ export default function PushSubscribeButton() {
     }
     setPermission((Notification.permission || 'default') as PermissionState)
     try {
-      const reg = await navigator.serviceWorker.ready
+      // Use getRegistration instead of .ready to avoid hanging when no SW is registered
+      const reg = await navigator.serviceWorker.getRegistration('/sw.js')
+      if (!reg) {
+        setStatus('unsubscribed')
+        return
+      }
       const sub = await reg.pushManager.getSubscription()
       setStatus(sub ? 'subscribed' : 'unsubscribed')
     } catch {
@@ -94,7 +99,7 @@ export default function PushSubscribeButton() {
   if (status === 'loading') return (
     <div className="flex items-center gap-2 text-xs text-neutral-400 py-2">
       <Loader2 size={13} className="animate-spin" />
-      Benachrichtigungen werden geladen…
+      Wird geladen…
     </div>
   )
   if (permission === 'denied') return (
